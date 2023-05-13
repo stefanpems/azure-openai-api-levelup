@@ -67,7 +67,7 @@ Create Azure Resource Group
 
 ```bash
 export resourceGroupName="openai-levelup-rg"
-export location="eastus"
+export location="westeurope"
 az group create --name $resourceGroupName --location $location
 ```
 
