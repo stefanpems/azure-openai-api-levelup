@@ -43,7 +43,8 @@ namespace TransactionClassification
 
         private const string promptRL = @"Sei un esperto di Microsoft Defender for Cloud Apps.
             Un cliente che chiede se il prodotto offre determinate capacità.
-            Segnala la URL della documentazione ufficiale Microsoft dove il cliente può trovare la risposta.
+            Segnala la URL della eventuale documentazione ufficiale Microsoft dove il cliente può trovare la risposta.
+            Deve essere una URL realmente esistente. Se non esiste scrivi 'N.A.'. 
 
             La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA. 
 
