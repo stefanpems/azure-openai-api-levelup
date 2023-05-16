@@ -64,7 +64,7 @@ namespace TransactionClassification
             // Retrieve the blob from the storage account.
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
-            log.LogInformation("-----------------------------\n\n  Run - Debug #5 \n-----------------------------");
+            log.LogInformation("-----------------------------\n\n  Run - Debug #5\n-----------------------------");
             
             // convert from system.binary to system.io.stream
             var stream = new MemoryStream(blobContent.Value.Content.ToArray());
