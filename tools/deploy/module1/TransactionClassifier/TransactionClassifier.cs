@@ -22,11 +22,11 @@ namespace TransactionClassification
         private const string promptSA = @"Sei un esperto di Microsoft Defender for Cloud Apps.
             Devi rispondere alla domanda di un cliente che chiede se il prodotto offre determinate capacità.
 
-            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA. 
 
-            Le risposte possibili sono: Sì, No, Parzialmente.
+            Rispondi solo con una di queste 3 parole: Sì, No, Parzialmente. 
 
-            Domanda del cliente: CUSTOMER_QUESTION
+            Domanda del cliente: CUSTOMER_QUESTION 
 
             La risposta è: ";
 
@@ -35,9 +35,9 @@ namespace TransactionClassification
             Rispondi in due righe, dando un minimo di spiegazioni.
             Tieni un tono ufficiale ed impersonale.
             
-            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA. 
              
-            Domanda del cliente: CUSTOMER_QUESTION
+            Domanda del cliente: CUSTOMER_QUESTION 
 
             La risposta è: ";
 
@@ -45,9 +45,9 @@ namespace TransactionClassification
             Un cliente che chiede se il prodotto offre determinate capacità.
             Segnala la URL della documentazione ufficiale Microsoft dove il cliente può trovare la risposta.
 
-            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA. 
 
-            Domanda del cliente: CUSTOMER_QUESTION
+            Domanda del cliente: CUSTOMER_QUESTION 
 
             La URL dove trovare la risposta è: ";
 
@@ -163,10 +163,31 @@ namespace TransactionClassification
                 completion = completionsResponse.Value.Choices[0].Text;
             }
             catch(Exception ex){
-                log.LogError("-----------------------------\n\n  QueryAOAI - Error! \n" + ex.ToString() + "\n-----------------------------");
-                completion = string.Concat("ERROR: ", ex.Message);
-                log.LogError("-----------------------------");
-                //do not throw(ex);
+                if(ex.Message.Contains("Please retry after 60 seconds")){
+
+                    //Sleep
+                    log.LogInformation("--Waiting 70 seconds");
+                    System.Threading.Thread.Sleep(70000);
+                    
+                    //Retry
+                    try{
+                        Response<Completions> completionsResponse = client.GetCompletions(engine, prompt);
+                         completion = completionsResponse.Value.Choices[0].Text;
+
+                    }
+                    catch(Exception ex2){
+                        log.LogError("-----------------------------\n\n  QueryAOAI - Error (post sleep)! \n" + ex2.ToString() + "\n-----------------------------");
+                        completion = string.Concat("ERROR: (post sleep) ", ex2.Message);
+                        log.LogError("-----------------------------");
+                        //do not throw(ex);
+                    }
+                }
+                else{
+                    log.LogError("-----------------------------\n\n  QueryAOAI - Error! \n" + ex.ToString() + "\n-----------------------------");
+                    completion = string.Concat("ERROR: ", ex.Message);
+                    log.LogError("-----------------------------");
+                    //do not throw(ex);
+                }
             }
 
             log.LogInformation("-------------------------------------------------\n\n  QueryAOAI - Completion:\n-------------------------------------------------");
