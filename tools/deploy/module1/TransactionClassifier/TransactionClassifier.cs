@@ -44,7 +44,7 @@ namespace TransactionClassification
             The answer is:";
         */
 
-        private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps e devi rispondere al cliente se quanto richiesto è offerto dal prodotto nativamente o tramite integrazione con altri prodotti.
+        private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps e devi rispondere al cliente se quanto richiesto è offerto dal prodotto nativamente o tramite integrazione con altri prodotti Microsoft.
             Scrivi due righe per giustificare la risposta.
 
             Domanda del cliente:: CUSTOMER_QUESTION
