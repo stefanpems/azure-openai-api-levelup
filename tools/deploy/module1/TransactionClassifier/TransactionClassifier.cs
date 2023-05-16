@@ -126,6 +126,12 @@ namespace TransactionClassification
                 outputBlobClient.Upload(streamOut);
             }
             
+             // delete the processed CSV
+            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
+            try{
+                blobClient.DeleteIfExists();
+            }
+            catch{}
 
             log.LogInformation("-----------------------------\n\n  Run - END!!!!!\n-----------------------------");
                 
@@ -157,7 +163,7 @@ namespace TransactionClassification
             log.LogInformation("-------------------------------------------------\n\n  QueryAOAI - Completion:\n-------------------------------------------------");
             log.LogInformation(completion);
             log.LogInformation("-------------------------------------------------");   
-                     
+
             return completion;
         }
 
