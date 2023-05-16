@@ -50,18 +50,26 @@ namespace TransactionClassification
             // Get the blob information from the event grid event.
             var data = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
             // retrieve continer name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
+            log.LogInformation("-----------------------------\n\n  Run - Debug #1\n-----------------------------");
             var containerName = data.Url.Split('/')[3];
+            log.LogInformation("-----------------------------\n\n  Run - Debug #2: " + containerName + "\n-----------------------------");
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
             var blobName = data.Url.Split('/')[4]; 
-
+            log.LogInformation("-----------------------------\n\n  Run - Debug #3: " + blobName + "\n-----------------------------");
+            
             var connectionString = GetEnvironmentVariable("STORAGE_ACCOUNT_CONNECTION_STRING");
+            log.LogInformation("-----------------------------\n\n  Run - Debug #4: " + connectionString + "\n-----------------------------");
+            
                 
             // Retrieve the blob from the storage account.
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
+            log.LogInformation("-----------------------------\n\n  Run - Debug #5 \n-----------------------------");
             
             // convert from system.binary to system.io.stream
             var stream = new MemoryStream(blobContent.Value.Content.ToArray());
+            log.LogInformation("-----------------------------\n\n  Run - Debug #6\n-----------------------------");
+            
 
             // set up connection to Azure OpenAI API client
             string endpoint = GetEnvironmentVariable("OPENAI_API_BASE");
