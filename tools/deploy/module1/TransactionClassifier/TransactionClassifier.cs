@@ -96,7 +96,7 @@ namespace TransactionClassification
             // for each csv record, set value in the column named "classification" to response from Azure OpenAI API Completion API
             // for each csv record, set value in the column named "Answer" to response from Azure OpenAI API Completion API
             log.LogInformation("-----------------------------\n\n  Run - About to loop the input rows!\n-----------------------------");
-            int rn=1;
+            int rn=0;
             foreach (var record in records)
             {
                 /*
@@ -104,9 +104,9 @@ namespace TransactionClassification
                 
                 record.classification = classification;
                 */
-
+                rn++;
                 log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " \n-----------------------------");
-            
+
                 string answer = ClassifyTransaction(record, prompt, client, log);
                 
                 record.Answer = answer;
@@ -142,9 +142,9 @@ namespace TransactionClassification
             
             prompt = prompt.Replace("CUSTOMER_QUESTION", transaction.Question);
 
-            log.LogInformation("-----------------------------\n\n  ClassifyTransaction - Prompt:\n-----------------------------");
+            log.LogInformation("---------------------------------------\n\n  ClassifyTransaction - Prompt:\n---------------------------------------");
             log.LogInformation(prompt);
-            log.LogInformation("-----------------------------");
+            log.LogInformation("---------------------------------------");
             
             string engine = GetEnvironmentVariable("OPENAI_API_MODEL");
 
@@ -153,9 +153,9 @@ namespace TransactionClassification
             try{
                 Response<Completions> completionsResponse = client.GetCompletions(engine, prompt);
                 completion = completionsResponse.Value.Choices[0].Text;
-                log.LogInformation("-----------------------------\n\n  ClassifyTransaction - Completion:\n-----------------------------");
+                log.LogInformation("-------------------------------------------------\n\n  ClassifyTransaction - Completion:\n-------------------------------------------------");
                 log.LogInformation(completion);
-                log.LogInformation("-----------------------------");
+                log.LogInformation("-------------------------------------------------");
             }
             catch(Exception ex){
                 log.LogError("-----------------------------\n\n  ClassifyTransaction - Error! \n" + ex.ToString() + "\n-----------------------------");
