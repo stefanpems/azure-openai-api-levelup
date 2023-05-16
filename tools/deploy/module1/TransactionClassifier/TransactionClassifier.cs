@@ -130,6 +130,9 @@ namespace TransactionClassification
                 outputBlobClient.Upload(stream2);
             }
             
+
+            log.LogInformation("-----------------------------\n\n  Run - END!!!!!\n-----------------------------");
+                
         }
                 
         private static string ClassifyTransaction(dynamic transaction, string prompt, OpenAIClient client, ILogger log)
