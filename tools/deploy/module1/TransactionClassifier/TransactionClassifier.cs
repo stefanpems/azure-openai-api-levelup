@@ -18,18 +18,29 @@ namespace TransactionClassification
 {
     public static class TransactionClassifier
     {
-        private const string prompt = @"You are a data expert working for the National Library of Scotland.
-You are analysing all transactions over £25,000 in value and classifying them into one of five categories.
-The five categories are Building Improvement, Literature & Archive, Utility Bills, Professional Services and Software/IT.
-If you can't tell what it is, say Could not classify
+        private const string promptold = @"You are a data expert working for the National Library of Scotland.
+            You are analysing all transactions over ï¿½25,000 in value and classifying them into one of five categories.
+            The five categories are Building Improvement, Literature & Archive, Utility Bills, Professional Services and Software/IT.
+            If you can't tell what it is, say Could not classify
 
-Transaction:
+            Transaction:
 
-Supplier: SUPPLIER_NAME
-Description: DESCRIPTION_TEXT
-Value: TRANSACTION_VALUE
+            Supplier: SUPPLIER_NAME
+            Description: DESCRIPTION_TEXT
+            Value: TRANSACTION_VALUE
 
-The classification is:";
+            The classification is:";
+
+        private const string prompt = @"You are an expert on cybersecurity, selling Microsoft security technologies. 
+            You are answering a list of questions made by a customer interested mainly to Microsoft Defender for Cloud Apps.
+            The customer is evaluating it against other solutions from competitors.
+            Ideally, you want to answer positively to every question. 
+            If not possible, you want to offer alternatives with the integration with other Microsoft security products.
+            Questions and answers are in Italian.
+
+            Question: CUSTOMER_QUESTION
+
+            The answer is:";
 
         [FunctionName("TransactionClassifier")]
         public static void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
@@ -63,11 +74,18 @@ The classification is:";
             string prompt = TransactionClassifier.prompt;
 
             // for each csv record, set value in the column named "classification" to response from Azure OpenAI API Completion API
+            // for each csv record, set value in the column named "Answer" to response from Azure OpenAI API Completion API
             foreach (var record in records)
             {
+                /*
                 string classification = ClassifyTransaction(record, prompt, client);
                 
                 record.classification = classification;
+                */
+
+                string answer = ClassifyTransaction(record, prompt, client);
+                
+                record.Answer = answer;
             }
             
             // create a new file to store updated csv file
@@ -90,9 +108,13 @@ The classification is:";
                 
         private static string ClassifyTransaction(dynamic transaction, string prompt, OpenAIClient client)
         {
+            /*
             prompt = prompt.Replace("SUPPLIER_NAME", transaction.Supplier);
             prompt = prompt.Replace("DESCRIPTION_TEXT", transaction.Description);
             prompt = prompt.Replace("TRANSACTION_VALUE", transaction.Transaction_value);
+            */
+
+            prompt = prompt.Replace("CUSTOMER_QUESTION", transaction.Question);
 
             string engine = GetEnvironmentVariable("OPENAI_API_MODEL");
 
