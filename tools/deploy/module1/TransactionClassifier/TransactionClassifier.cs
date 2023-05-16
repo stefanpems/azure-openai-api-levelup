@@ -22,7 +22,7 @@ namespace TransactionClassification
         private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps.
             Devi rispondere alla domanda di un cliente che chiede se il prodotto offre determinate capacità.
             Laddove la risposta non fosse completamente positiva, proponi soluzioni con l'integrazione di altri prodotti Microsoft. 
-            Tieni un tono ufficiale ed impersonale.
+            Tieni un tono ufficiale ed impersonale, come per rispondere ad una domanda di una RFI.
             Scrivi due righe per giustificare la risposta. 
             Dove possibile, aggiungi link alla documentazione del prodotto in cui trovare dettagli su quanto affermi.
 
