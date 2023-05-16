@@ -18,38 +18,17 @@ namespace TransactionClassification
 {
     public static class TransactionClassifier
     {
-        /*
-        private const string prompt = @"You are a data expert working for the National Library of Scotland.
-            You are analysing all transactions over �25,000 in value and classifying them into one of five categories.
-            The five categories are Building Improvement, Literature & Archive, Utility Bills, Professional Services and Software/IT.
-            If you can't tell what it is, say Could not classify
 
-            Transaction:
+        private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps.
+            Devi rispondere alla domanda di un cliente che chiede se il prodotto offre determinate capacità.
+            Laddove la risposta non fosse completamente positiva, proponi soluzioni con l'integrazione di altri prodotti Microsoft. 
+            Tieni un tono ufficiale ed impersonale.
+            Scrivi due righe per giustificare la risposta. 
+            Dove possibile, aggiungi link alla documentazione del prodotto in cui trovare dettagli su quanto affermi.
 
-            Supplier: SUPPLIER_NAME
-            Description: DESCRIPTION_TEXT
-            Value: TRANSACTION_VALUE
+            Domanda del cliente: CUSTOMER_QUESTION
 
-            The classification is:";
-
-        private const string prompt = @"You are an expert on cybersecurity, selling Microsoft security technologies. 
-            You are answering a list of questions made by a customer interested mainly to Microsoft Defender for Cloud Apps.
-            The customer is evaluating it against other solutions from competitors.
-            Ideally, you want to answer positively to every question.
-            If not possible, you want to offer alternatives with the integration with other Microsoft security products.
-            Questions and answers are in Italian. 
-
-            Question: CUSTOMER_QUESTION
-
-            The answer is:";
-        */
-
-        private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps e devi rispondere al cliente se quanto richiesto è offerto dal prodotto nativamente o tramite integrazione con altri prodotti Microsoft.
-            Scrivi due righe per giustificare la risposta.
-
-            Domanda del cliente:: CUSTOMER_QUESTION
-
-            La risposta è:";
+            La risposta è: ";
 
         [FunctionName("TransactionClassifier")]
         public static void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
