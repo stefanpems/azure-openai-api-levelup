@@ -105,7 +105,8 @@ namespace TransactionClassification
                 // convert StringWriter to a Stream so it could be uploaded via BlobClient
                 log.LogInformation("-----------------------------\n\n  Run - About to upload the output file!\n-----------------------------");
                 var stream2 = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(writer.ToString()));
-                var outputBlobClient = new Azure.Storage.Blobs.BlobClient(connectionString, "output", blobName);
+                var outBlobName = blobName.Replace("Q-","A-");
+                var outputBlobClient = new Azure.Storage.Blobs.BlobClient(connectionString, "output", outBlobName);
                 outputBlobClient.Upload(stream2);
             }
             
