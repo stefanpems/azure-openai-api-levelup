@@ -181,7 +181,7 @@ namespace TransactionClassification
                     else
                     {
                         log.LogError("-----------------------------\n\n  QueryAOAI - Error! \n" + ex.ToString() + "\n-----------------------------");
-                        completion = string.Concat("ERROR: ", ex.Message);
+                        completion = string.Concat("ERROR: ", ex.Message.Substring(0,100).Trim());
                         log.LogError("-----------------------------");
                         //do not throw(ex);
                     }
