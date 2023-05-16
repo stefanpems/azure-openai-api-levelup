@@ -163,38 +163,36 @@ namespace TransactionClassification
 
             // call the Azure OpenAI API Completion API
             string completion = string.Empty;
-            try{
-                Response<Completions> completionsResponse = client.GetCompletions(engine, prompt);
-                completion = completionsResponse.Value.Choices[0].Text;
-            }
-            catch(Exception ex){
-                if(ex.Message.Contains("Please retry after 60 seconds")){
+            int maxRetryNum = 3;
+            for(int i = 0; i < maxRetryNum; i++){
+                log.LogInformation("-- Tentaive #" + i.ToString());
+                try{
+                    Response<Completions> completionsResponse = client.GetCompletions(engine, prompt);
+                    completion = completionsResponse.Value.Choices[0].Text;
+                }
+                catch(Exception ex){
+                    if(ex.Message.Contains("Please retry after 60 seconds")){
+                        //Sleep
+                        log.LogInformation("-- Waiting 70 seconds");
+                        System.Threading.Thread.Sleep(70000);
 
-                    //Sleep
-                    log.LogInformation("--Waiting 70 seconds");
-                    System.Threading.Thread.Sleep(70000);
-                    
-                    //Retry
-                    try{
-                        Response<Completions> completionsResponse = client.GetCompletions(engine, prompt);
-                         completion = completionsResponse.Value.Choices[0].Text;
-
+                        //Do not throw
                     }
-                    catch(Exception ex2){
-                        log.LogError("-----------------------------\n\n  QueryAOAI - Error (post sleep)! \n" + ex2.ToString() + "\n-----------------------------");
-                        completion = string.Concat("ERROR: (post sleep) ", ex2.Message);
+                    else
+                    {
+                        log.LogError("-----------------------------\n\n  QueryAOAI - Error! \n" + ex.ToString() + "\n-----------------------------");
+                        completion = string.Concat("ERROR: ", ex.Message);
                         log.LogError("-----------------------------");
                         //do not throw(ex);
                     }
                 }
-                else{
-                    log.LogError("-----------------------------\n\n  QueryAOAI - Error! \n" + ex.ToString() + "\n-----------------------------");
-                    completion = string.Concat("ERROR: ", ex.Message);
-                    log.LogError("-----------------------------");
-                    //do not throw(ex);
+                if(completion != string.Empty){
+                    log.LogInformation("-- Tentaive #" + i.ToString() + ". Break!");
+                
+                    break;
                 }
             }
-
+            
             log.LogInformation("-------------------------------------------------\n\n  QueryAOAI - Completion:\n-------------------------------------------------");
             log.LogInformation(completion);
             log.LogInformation("-------------------------------------------------");   
