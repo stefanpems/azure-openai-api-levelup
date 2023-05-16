@@ -52,7 +52,7 @@ namespace TransactionClassification
             // retrieve continer name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
             var containerName = data.Url.Split('/')[3];
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
-            var blobName = data.Url.Split('/')[4];
+            var blobName = data.Url.Split('/')[4]; 
 
             var connectionString = GetEnvironmentVariable("STORAGE_ACCOUNT_CONNECTION_STRING");
                 
