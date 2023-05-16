@@ -70,10 +70,21 @@ namespace TransactionClassification
             log.LogInformation("----\n\n  Run - Debug #4: " + connectionString + "\n-----------------------------");
             
                 
-            // Retrieve the blob from the storage account.
+            // Retrieve the blob from the storage account and read its content.
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
             log.LogInformation("----\n\n  Run - Debug #5\n-----------------------------");
+
+             // delete the processed CSV
+            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
+            try{
+                blobClient.DeleteIfExists();
+            }
+            catch (Exception ex){
+                log.LogWarning("-----------------------------\n\n  Run - Cannot delete input blob: \n"+ ex.ToString() + "-----------------------------");
+            
+                //Do not throw
+            }
             
             // convert from system.binary to system.io.streamIn
             var streamIn = new MemoryStream(blobContent.Value.Content.ToArray());
@@ -133,13 +144,6 @@ namespace TransactionClassification
                 outputBlobClient.Upload(streamOut);
             }
             
-             // delete the processed CSV
-            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
-            try{
-                blobClient.DeleteIfExists();
-            }
-            catch{}
-
             log.LogInformation("-----------------------------\n\n  Run - END!!!!!\n-----------------------------");
                 
         }
