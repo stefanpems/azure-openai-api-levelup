@@ -46,7 +46,7 @@ namespace TransactionClassification
 
         private const string prompt = @"Sei un esperto di Microsoft Defender for Cloud Apps e devi rispondere al cliente se quanto richiesto è offerto dal prodotto nativamente o tramite integrazione con altri prodotti.
             Scrivi due righe per giustificare la risposta.
-            
+
             Domanda del cliente:: CUSTOMER_QUESTION
 
             La risposta è:";
@@ -150,7 +150,8 @@ namespace TransactionClassification
             }
             catch(Exception ex){
                 log.LogError("-----------------------------\n\n  ClassifyTransaction - Error!\n" + ex.ToString() + "\n-----------------------------");
-                throw(ex);
+                completion = ex.Message;
+                //do not throw(ex);
             }
             
             return completion;
