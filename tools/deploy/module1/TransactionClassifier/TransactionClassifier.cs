@@ -21,6 +21,9 @@ namespace TransactionClassification
 
         private const string promptSA = @"Sei un esperto di Microsoft Defender for Cloud Apps.
             Devi rispondere alla domanda di un cliente che chiede se il prodotto offre determinate capacità.
+
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
+
             Le risposte possibili sono: Sì, No, Parzialmente.
 
             Domanda del cliente: CUSTOMER_QUESTION
@@ -31,7 +34,9 @@ namespace TransactionClassification
             Un cliente che chiede se il prodotto offre determinate capacità.
             Rispondi in due righe, dando un minimo di spiegazioni.
             Tieni un tono ufficiale ed impersonale.
-                         
+            
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
+             
             Domanda del cliente: CUSTOMER_QUESTION
 
             La risposta è: ";
@@ -39,6 +44,8 @@ namespace TransactionClassification
         private const string promptRL = @"Sei un esperto di Microsoft Defender for Cloud Apps.
             Un cliente che chiede se il prodotto offre determinate capacità.
             Segnala la URL della documentazione ufficiale Microsoft dove il cliente può trovare la risposta.
+
+            La domanda del cliente fa riferimento a questo ambito funzionale: QUESTION_AREA
 
             Domanda del cliente: CUSTOMER_QUESTION
 
@@ -139,6 +146,8 @@ namespace TransactionClassification
                 
         private static string QueryAOAI(dynamic transaction, string prompt, OpenAIClient client, ILogger log)
         {
+            prompt = prompt.Replace("QUESTION_AREA", transaction.Area);
+
             prompt = prompt.Replace("CUSTOMER_QUESTION", transaction.Question);
 
             log.LogInformation("---------------------------------------\n\n  QueryAOAI - Prompt:\n---------------------------------------");
