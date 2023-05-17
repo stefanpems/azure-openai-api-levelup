@@ -61,9 +61,11 @@ namespace TransactionClassification
             var data = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
             // retrieve continer name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
             log.LogInformation("----\n\n  Run - Debug #1\n-----------------------------");
+            
             var containerName = data.Url.Split('/')[3];
             log.LogInformation("----\n\n  Run - Debug #2: " + containerName + "\n-----------------------------");
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
+            
             var blobName = data.Url.Split('/')[4]; 
             var outBlobName = blobName.Replace("Q-","A-");                    
             log.LogInformation("----\n\n  Run - Debug #3: " + blobName + "\n-----------------------------");
@@ -71,30 +73,41 @@ namespace TransactionClassification
             var connectionString = GetEnvironmentVariable("STORAGE_ACCOUNT_CONNECTION_STRING");
             log.LogInformation("----\n\n  Run - Debug #4: " + connectionString + "\n-----------------------------");
             
+            string promptSA = GetEnvironmentVariable("PROMPT_SA");  
+            if(string.IsNullOrEmpty(promptSA)){promptSA = TransactionClassifier.promptSA;}            
+            string promptLA = GetEnvironmentVariable("PROMPT_LA");
+            if(string.IsNullOrEmpty(promptLA)){promptLA = TransactionClassifier.promptLA;}
+            string promptRL = GetEnvironmentVariable("PROMPT_RL");
+            if(string.IsNullOrEmpty(promptLA)){promptRL = TransactionClassifier.promptLA;}
+            log.LogInformation("----\n\n  Run - Debug #5 \n-----------------------------");
+            
+
                 
             // Retrieve the blob from the storage account and read its content.
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
-            log.LogInformation("----\n\n  Run - Debug #5\n-----------------------------");
+            log.LogInformation("----\n\n  Run - Debug #6\n-----------------------------");
                          
             // convert from system.binary to system.io.streamIn
             var streamIn = new MemoryStream(blobContent.Value.Content.ToArray());
-            log.LogInformation("----\n\n  Run - Debug #6\n-----------------------------");
+            log.LogInformation("----\n\n  Run - Debug #7\n-----------------------------");
             
 
             // set up connection to Azure OpenAI API client
             string endpoint = GetEnvironmentVariable("OPENAI_API_BASE");
             string key = GetEnvironmentVariable("OPENAI_API_KEY");           
-            OpenAIClient client = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
+            log.LogInformation("----\n\n  Run - Debug #8\n-----------------------------");
 
+            OpenAIClient client = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
+            log.LogInformation("-----------------------------\n\n  Run - Debug #9 - About to get records from CSV!\n-----------------------------");
+            
             // read content of uploaded csv file
-            log.LogInformation("-----------------------------\n\n  Run - About to get records from CSV!\n-----------------------------");
             using var reader = new StreamReader(streamIn);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             var records = csv.GetRecords<dynamic>().ToList();
 
             // delete the processed CSV
-            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
+            //log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
             try{
                 //blobClient.DeleteIfExists();
             }
@@ -104,11 +117,8 @@ namespace TransactionClassification
                 //Do not throw
             }
 
-            string promptSA = TransactionClassifier.promptSA;
-            string promptLA = TransactionClassifier.promptLA;
-            string promptRL = TransactionClassifier.promptRL;
-
-
+            
+            
             // for each csv record, set value in the columns named "ShortAnswer", "LongAnswer" and "ReferenceLink" with the responses from Azure OpenAI API Completion API
             log.LogInformation("-----------------------------\n\n  Run - About to loop the input rows!\n-----------------------------");
             int rn=0;
@@ -117,17 +127,20 @@ namespace TransactionClassification
                 rn++;
 
                 log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 1/3 \n-----------------------------");
-                string shortAnswer = QueryAOAI(record, promptSA, client, log);
+                string shortAnswer = "test_sa"; // string.Empty;
+                //shortAnswer = QueryAOAI(record, promptSA, client, log);
                 record.ShortAnswer = shortAnswer;
                 
                 
                 log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 2/3 \n-----------------------------");
-                string longAnswer = QueryAOAI(record, promptLA, client, log);
+                string longAnswer = "test_la"; // string.Empty;
+                //longAnswer = QueryAOAI(record, promptLA, client, log);
                 record.LongAnswer = longAnswer;
 
 
                 log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 3/3 \n-----------------------------");
-                string referenceLink = QueryAOAI(record, promptRL, client, log);
+                string referenceLink = "test_rl"; // string.Empty; 
+                //referenceLink = QueryAOAI(record, promptRL, client, log);
                 record.ReferenceLink = referenceLink;
 
                 // create a new file to store updated csv file
