@@ -65,6 +65,7 @@ namespace TransactionClassification
             log.LogInformation("----\n\n  Run - Debug #2: " + containerName + "\n-----------------------------");
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
             var blobName = data.Url.Split('/')[4]; 
+            var outBlobName = blobName.Replace("Q-","A-");                    
             log.LogInformation("----\n\n  Run - Debug #3: " + blobName + "\n-----------------------------");
             
             var connectionString = GetEnvironmentVariable("STORAGE_ACCOUNT_CONNECTION_STRING");
@@ -114,36 +115,43 @@ namespace TransactionClassification
             foreach (var record in records)
             {
                 rn++;
-                log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " \n-----------------------------");
 
+                log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 1/3 \n-----------------------------");
                 string shortAnswer = QueryAOAI(record, promptSA, client, log);
                 record.ShortAnswer = shortAnswer;
                 
+                
+                log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 2/3 \n-----------------------------");
                 string longAnswer = QueryAOAI(record, promptLA, client, log);
                 record.LongAnswer = longAnswer;
 
+
+                log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - Query 3/3 \n-----------------------------");
                 string referenceLink = QueryAOAI(record, promptRL, client, log);
                 record.ReferenceLink = referenceLink;
-            }
-            
-            // create a new file to store updated csv file
-            log.LogInformation("-----------------------------\n\n  Run - About to write the outputs!\n-----------------------------");
-            using (var writer = new StringWriter())
-            {
-                using (var acsv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    acsv.WriteRecords(records);
 
-                    String str1 = writer.ToString();
+                // create a new file to store updated csv file
+                log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - About to write the outputs!\n-----------------------------");
+                using (var writer = new StringWriter())
+                {
+                    using (var acsv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                    {
+                        acsv.WriteRecords(records);
+
+                        String str1 = writer.ToString();
+                    }
+
+                    // convert StringWriter to a Stream so it could be uploaded via BlobClient
+                    log.LogInformation("-----------------------------\n\n  Run - row: " +rn.ToString() + " - About to upload the output file " + outBlobName + "\n-----------------------------");
+                    var streamOut = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(writer.ToString()));
+                    var outputBlobClient = new Azure.Storage.Blobs.BlobClient(connectionString, "output", outBlobName);
+                    outputBlobClient.Upload(streamOut, overwrite: true);
                 }
 
-                // convert StringWriter to a Stream so it could be uploaded via BlobClient
-                log.LogInformation("-----------------------------\n\n  Run - About to upload the output file!\n-----------------------------");
-                var streamOut = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(writer.ToString()));
-                var outBlobName = blobName.Replace("Q-","A-");
-                var outputBlobClient = new Azure.Storage.Blobs.BlobClient(connectionString, "output", outBlobName);
-                outputBlobClient.Upload(streamOut);
+
             }
+            
+
             
             log.LogInformation("-----------------------------\n\n  Run - END!!!!!\n-----------------------------");
                 
