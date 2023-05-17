@@ -76,18 +76,7 @@ namespace TransactionClassification
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
             log.LogInformation("----\n\n  Run - Debug #5\n-----------------------------");
-
-             // delete the processed CSV
-            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
-            try{
-                blobClient.DeleteIfExists();
-            }
-            catch (Exception ex){
-                log.LogWarning("-----------------------------\n\n  Run - Cannot delete input blob: \n"+ ex.ToString() + "-----------------------------");
-            
-                //Do not throw
-            }
-            
+                         
             // convert from system.binary to system.io.streamIn
             var streamIn = new MemoryStream(blobContent.Value.Content.ToArray());
             log.LogInformation("----\n\n  Run - Debug #6\n-----------------------------");
@@ -103,6 +92,17 @@ namespace TransactionClassification
             using var reader = new StreamReader(streamIn);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             var records = csv.GetRecords<dynamic>().ToList();
+
+            // delete the processed CSV
+            log.LogInformation("-----------------------------\n\n  Run - About to delete the processed input!\n-----------------------------");
+            try{
+                //blobClient.DeleteIfExists();
+            }
+            catch (Exception ex){
+                log.LogWarning("-----------------------------\n\n  Run - Cannot delete input blob: \n"+ ex.ToString() + "-----------------------------");
+            
+                //Do not throw
+            }
 
             string promptSA = TransactionClassifier.promptSA;
             string promptLA = TransactionClassifier.promptLA;
