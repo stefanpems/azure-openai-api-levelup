@@ -60,18 +60,18 @@ namespace TransactionClassification
             // Get the blob information from the event grid event.
             var data = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
             // retrieve continer name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
-            log.LogInformation("----\n\n  Run - Debug #1\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #1\n\n");
             
             var containerName = data.Url.Split('/')[3];
-            log.LogInformation("----\n\n  Run - Debug #2: " + containerName + "\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #2: " + containerName + "\n\n");
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
             
             var blobName = data.Url.Split('/')[4]; 
             var outBlobName = blobName.Replace("Q-","A-");                    
-            log.LogInformation("----\n\n  Run - Debug #3: " + blobName + "\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #3: " + blobName + "\n");
             
             var connectionString = GetEnvironmentVariable("STORAGE_ACCOUNT_CONNECTION_STRING");
-            log.LogInformation("----\n\n  Run - Debug #4: " + connectionString + "\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #4: " + connectionString + "\n\n");
             
             string promptSA = GetEnvironmentVariable("PROMPT_SA");  
             if(string.IsNullOrEmpty(promptSA)){promptSA = TransactionClassifier.promptSA;}            
@@ -79,27 +79,27 @@ namespace TransactionClassification
             if(string.IsNullOrEmpty(promptLA)){promptLA = TransactionClassifier.promptLA;}
             string promptRL = GetEnvironmentVariable("PROMPT_RL");
             if(string.IsNullOrEmpty(promptLA)){promptRL = TransactionClassifier.promptLA;}
-            log.LogInformation("----\n\n  Run - Debug #5 \n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #5 \n\n");
             
 
                 
             // Retrieve the blob from the storage account and read its content.
             var blobClient = new Azure.Storage.Blobs.BlobClient(connectionString, containerName, blobName);
             var blobContent = blobClient.DownloadContent();
-            log.LogInformation("----\n\n  Run - Debug #6\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #6\n\n");
                          
             // convert from system.binary to system.io.streamIn
             var streamIn = new MemoryStream(blobContent.Value.Content.ToArray());
-            log.LogInformation("----\n\n  Run - Debug #7\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #7\n\n");
             
 
             // set up connection to Azure OpenAI API client
             string endpoint = GetEnvironmentVariable("OPENAI_API_BASE");
             string key = GetEnvironmentVariable("OPENAI_API_KEY");           
-            log.LogInformation("----\n\n  Run - Debug #8\n-----------------------------");
+            log.LogInformation("°°°°°°°\n\n  Run - Debug #8\n\n");
 
             OpenAIClient client = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
-            log.LogInformation("-----------------------------\n\n  Run - Debug #9 - About to get records from CSV!\n-----------------------------");
+            log.LogInformation("-------------------------°°°°°°°\n\n  Run - Debug #9 - About to get records from CSV!\n\n-----------------------------");
             
             // read content of uploaded csv file
             using var reader = new StreamReader(streamIn);
